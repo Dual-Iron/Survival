@@ -57,7 +57,7 @@ namespace Survival
             if (!string.IsNullOrEmpty(self.label.text) && self.pausedWarningText)
             {
                 if (self.hud.owner is Player player && player.abstractCreature.world.game.IsStorySession && player.abstractCreature.world.game.clock > 1200)
-                    self.label.text = "Paused - Warning! Quitting after 30 seconds into a cycle resets your karma";
+                    self.label.text = "Paused - Warning! Quitting after 30 seconds into a cycle resets your current karma" + (player.KarmaIsReinforced ? " and karma shield" : "");
                 else
                     self.label.text = "Paused";
             }
@@ -71,6 +71,7 @@ namespace Survival
                 {
                     var tempKarma = self.karma;
                     self.karma = 0;
+                    self.reinforcedKarma = false;
                     var ret = orig(self, false, false);
                     self.karma = tempKarma;
                     return ret;
