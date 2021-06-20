@@ -10,17 +10,13 @@ using UnityEngine;
 
 namespace Survival
 {
-    public sealed class SurvivalRules
+    public sealed class SurvivalMod
     {
-        private RainWorld? rw;
-        public RainWorld RW => rw ??= UnityEngine.Object.FindObjectOfType<RainWorld>();
-        public RainWorldGame? RWGame => RW.processManager.currentMainLoop as RainWorldGame;
-
         public ManualLogSource Logger { get; }
 
         private int saveNum;
 
-        internal SurvivalRules(ManualLogSource logger)
+        internal SurvivalMod(ManualLogSource logger)
         {
             Logger = logger;
 
@@ -57,7 +53,8 @@ namespace Survival
             if (!string.IsNullOrEmpty(self.label.text) && self.pausedWarningText)
             {
                 if (self.hud.owner is Player player && player.abstractCreature.world.game.IsStorySession && player.abstractCreature.world.game.clock > 1200)
-                    self.label.text = "Paused - Warning! Quitting after 30 seconds into a cycle resets your current karma" + (player.KarmaIsReinforced ? " and karma shield" : "");
+                    self.label.text = $"Paused - Warning! Quitting after 30 seconds into a cycle resets your current karma" +
+                        (player.KarmaIsReinforced ? " and karma shield" : "");
                 else
                     self.label.text = "Paused";
             }

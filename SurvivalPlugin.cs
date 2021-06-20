@@ -6,7 +6,7 @@ namespace Survival
     [BepInPlugin("com.github.dual.survival", "Survival", "0.1.0")]
     public sealed class SurvivalPlugin : BaseUnityPlugin
     {
-        public SurvivalRules? SurvivalRule { get; private set; }
+        public SurvivalMod? SurvivalRule { get; private set; }
 
         public void OnEnable()
         {
