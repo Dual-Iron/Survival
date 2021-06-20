@@ -70,10 +70,12 @@ namespace Survival
                 if (saveAsIfPlayerDied)
                 {
                     var tempKarma = self.karma;
+                    var tempReinf = self.reinforcedKarma;
                     self.karma = 0;
                     self.reinforcedKarma = false;
                     var ret = orig(self, false, false);
                     self.karma = tempKarma;
+                    self.reinforcedKarma = tempReinf;
                     return ret;
                 }
                 return orig(self, false, false);
