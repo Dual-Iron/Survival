@@ -5,7 +5,6 @@ using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using RWCustom;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Survival
