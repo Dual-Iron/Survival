@@ -15,7 +15,7 @@
   
   <PropertyGroup>
     <!--Update version when necessary-->
-    <Version>0.0.0</Version>
+    <Version>1.0.0</Version>
     <TargetFramework>net35</TargetFramework>
     <DebugType>None</DebugType>
     <LangVersion>9.0</LangVersion>
