@@ -42,14 +42,14 @@ namespace Survival
 
             static bool GetterRedIsOutOfCycles(Func<StoryGameSession, bool> orig, StoryGameSession self)
             {
-                return !self.saveState.deathPersistentSaveData.reinforcedKarma;
+                return orig(self) || !self.saveState.deathPersistentSaveData.reinforcedKarma;
             }
         }
 
         private void TextPrompt_Update(On.HUD.TextPrompt.orig_Update orig, HUD.TextPrompt self)
         {
             orig(self);
-            if (!string.IsNullOrEmpty(self.label.text) && self.pausedWarningText)
+            if (self.currentlyShowing == HUD.TextPrompt.InfoID.Paused && !string.IsNullOrEmpty(self.label.text) && self.pausedWarningText)
             {
                 if (self.hud.owner is Player player && player.abstractCreature.world.game.IsStorySession && player.abstractCreature.world.game.clock > 1200)
                     self.label.text = $"Paused - Warning! Quitting after 30 seconds into a cycle resets your current karma" +
