@@ -145,24 +145,22 @@ namespace Survival
             else orig(self);
         }
 
-        private void SlugcatSelectMenu_Update(On.Menu.SlugcatSelectMenu.orig_Update orig, Menu.SlugcatSelectMenu self)
+        private void SlugcatSelectMenu_Update(On.Menu.SlugcatSelectMenu.orig_Update orig, SlugcatSelectMenu self)
         {
             var restartUpTemp = self.restartUp;
 
             orig(self);
 
-            if (!self.restartAvailable)
+            if (!self.restartAvailable && 
+                IsCurrentDead(self) && !Input.GetKey("r") && (self.slugcatPageIndex != 2 || !self.redIsDead) && !self.saveGameData[self.slugcatPageIndex].ascended)
             {
-                if (IsCurrentDead(self) && !Input.GetKey("r") && (self.slugcatPageIndex != 2 || !self.redIsDead) && !self.saveGameData[self.slugcatPageIndex].ascended)
+                self.restartUp = restartUpTemp;
+                self.restartUp = Custom.LerpAndTick(self.restartUp, 1f, 0.07f, 0.025f);
+                if (self.restartUp == 1f)
                 {
-                    self.restartUp = restartUpTemp;
-                    self.restartUp = Custom.LerpAndTick(self.restartUp, 1f, 0.07f, 0.025f);
-                    if (self.restartUp == 1f)
-                    {
-                        self.restartAvailable = true;
-                    }
-                    self.restartCheckbox.pos.y = Mathf.Lerp(-50f, 30f, self.restartUp);
+                    self.restartAvailable = true;
                 }
+                self.restartCheckbox.pos.y = Mathf.Lerp(-50f, 30f, self.restartUp);
             }
         }
 
