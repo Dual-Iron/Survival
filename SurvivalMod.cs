@@ -24,6 +24,7 @@ namespace Survival
             new Hook(typeof(StoryGameSession).GetMethod("get_RedIsOutOfCycles"), (Func<Func<StoryGameSession, bool>, StoryGameSession, bool>)GetterRedIsOutOfCycles)
                 .Apply();
 
+            On.HUD.KarmaMeter.Draw += KarmaMeter_Draw;
             IL.Menu.SlugcatSelectMenu.StartGame += SlugcatSelectMenu_StartGame;
             IL.Menu.SlugcatSelectMenu.MineForSaveData += SlugcatSelectMenu_MineForSaveData;
             On.Menu.SlugcatSelectMenu.Update += SlugcatSelectMenu_Update;
@@ -46,16 +47,43 @@ namespace Survival
             }
         }
 
+        private void KarmaMeter_Draw(On.HUD.KarmaMeter.orig_Draw orig, HUD.KarmaMeter self, float timeStacker)
+        {
+            orig(self, timeStacker);
+
+            var redness = self.showAsReinforced ? 0.33f : 0.5f;
+
+            var color = self.karmaSprite.color;
+            color.g = Mathf.Min(color.g, 1 - redness);
+            color.b = Mathf.Min(color.b, 1 - redness);
+            self.karmaSprite.color = color;
+
+            color = self.glowSprite.color;
+            color.g = Mathf.Min(color.g, 1 - redness);
+            color.b = Mathf.Min(color.b, 1 - redness);
+            self.glowSprite.color = color;
+        }
+
         private void TextPrompt_Update(On.HUD.TextPrompt.orig_Update orig, HUD.TextPrompt self)
         {
+            const string pretense = "Paused - Warning! Quitting after 30 seconds into a cycle ";
+
             orig(self);
             if (self.currentlyShowing == HUD.TextPrompt.InfoID.Paused && !string.IsNullOrEmpty(self.label.text) && self.pausedWarningText)
             {
                 if (self.hud.owner is Player player && player.abstractCreature.world.game.IsStorySession && player.abstractCreature.world.game.clock > 1200)
-                    self.label.text = $"Paused - Warning! Quitting after 30 seconds into a cycle resets your current karma" +
-                        (player.KarmaIsReinforced ? " and karma shield" : "");
+                {
+                    if (player.KarmaIsReinforced)
+                        self.label.text = pretense + "will remove your karma reinforcement";
+                    else if (player.Karma > 0)
+                        self.label.text = pretense + "will reset your current karma";
+                    else
+                        self.label.text = pretense + "will permanently end your game";
+                }
                 else
+                {
                     self.label.text = "Paused";
+                }
             }
         }
 
@@ -65,14 +93,22 @@ namespace Survival
             {
                 if (saveAsIfPlayerDied)
                 {
-                    var tempKarma = self.karma;
-                    var tempReinf = self.reinforcedKarma;
-                    self.karma = 0;
-                    self.reinforcedKarma = false;
-                    var ret = orig(self, false, false);
-                    self.karma = tempKarma;
-                    self.reinforcedKarma = tempReinf;
-                    return ret;
+                    if (self.reinforcedKarma)
+                    {
+                        self.reinforcedKarma = false;
+                        var ret = orig(self, false, false);
+                        self.reinforcedKarma = true;
+                        return ret;
+                    }
+                    if (self.karma > 0)
+                    {
+                        var tempKarma = self.karma;
+                        self.karma = 0;
+                        var ret = orig(self, false, false);
+                        self.karma = tempKarma;
+                        return ret;
+                    }
+                    return orig(self, true, true);
                 }
                 return orig(self, false, false);
             }
