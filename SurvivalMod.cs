@@ -85,18 +85,21 @@ namespace Survival
         {
             orig(self, timeStacker);
 
-            var redness = self.showAsReinforced ? 0.25f : 0.5f;
+            var redness = self.showAsReinforced ? 0.5f : 0.75f;
+            var brightness = self.showAsReinforced ? 1f : 0.85f;
 
             Color color;
 
             color = self.karmaSprite.color;
             color.g = Mathf.Min(color.g, 1 - redness);
             color.b = Mathf.Min(color.b, 1 - redness);
+            color.r = Mathf.Min(color.r, brightness);
             self.karmaSprite.color = color;
 
             color = self.glowSprite.color;
             color.g = Mathf.Min(color.g, 1 - redness);
             color.b = Mathf.Min(color.b, 1 - redness);
+            color.r = Mathf.Min(color.r, brightness);
             self.glowSprite.color = color;
         }
 
