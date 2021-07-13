@@ -24,6 +24,8 @@ namespace Survival
             new Hook(typeof(StoryGameSession).GetMethod("get_RedIsOutOfCycles"), (Func<Func<StoryGameSession, bool>, StoryGameSession, bool>)GetterRedIsOutOfCycles)
                 .Apply();
 
+            On.Menu.SlugcatSelectMenu.SlugcatPage.AddImage += SlugcatPage_AddImage;
+            On.Menu.MenuDepthIllustration.GrafUpdate += MenuDepthIllustration_GrafUpdate;
             On.HUD.KarmaMeter.Draw += KarmaMeter_Draw;
             IL.Menu.SlugcatSelectMenu.StartGame += SlugcatSelectMenu_StartGame;
             IL.Menu.SlugcatSelectMenu.MineForSaveData += SlugcatSelectMenu_MineForSaveData;
@@ -47,13 +49,47 @@ namespace Survival
             }
         }
 
+        private static bool IsCurrentDead(SlugcatSelectMenu self)
+        {
+            return IsDead(self, self.slugcatPageIndex);
+        }
+
+        private static bool IsDead(SlugcatSelectMenu self, int pageIndex)
+        {
+            return self.saveGameData[pageIndex]?.redsDeath ?? false;
+        }
+
+        private void SlugcatPage_AddImage(On.Menu.SlugcatSelectMenu.SlugcatPage.orig_AddImage orig, SlugcatSelectMenu.SlugcatPage self, bool ascended)
+        {
+            if (self.menu is SlugcatSelectMenu ssm && IsDead(ssm, self.SlugcatPageIndex))
+            {
+                if (self.slugcatNumber == 2)
+                    ssm.redIsDead = true;
+                else if (self.slugcatNumber != 0 && self.slugcatNumber != 1)
+                    ascended = true;
+            }
+            orig(self, ascended);
+        }
+
+        private void MenuDepthIllustration_GrafUpdate(On.Menu.MenuDepthIllustration.orig_GrafUpdate orig, MenuDepthIllustration self, float timeStacker)
+        {
+            orig(self, timeStacker);
+            if (self.fileName == "White Slugcat - 2" || self.fileName == "Yellow Slugcat - 1")
+            {
+                if (self.menu is SlugcatSelectMenu ssm && self.owner is MenuScene ms && ms.owner is SlugcatSelectMenu.SlugcatPage sp && IsDead(ssm, sp.SlugcatPageIndex))
+                    self.sprite.scaleX = 0;
+            }
+        }
+
         private void KarmaMeter_Draw(On.HUD.KarmaMeter.orig_Draw orig, HUD.KarmaMeter self, float timeStacker)
         {
             orig(self, timeStacker);
 
-            var redness = self.showAsReinforced ? 0.33f : 0.5f;
+            var redness = self.showAsReinforced ? 0.25f : 0.5f;
 
-            var color = self.karmaSprite.color;
+            Color color;
+
+            color = self.karmaSprite.color;
             color.g = Mathf.Min(color.g, 1 - redness);
             color.b = Mathf.Min(color.b, 1 - redness);
             self.karmaSprite.color = color;
@@ -165,11 +201,6 @@ namespace Survival
                 }
                 ssm.UpdateSelectedSlugcatInMiscProg();
             }
-        }
-
-        private static bool IsCurrentDead(SlugcatSelectMenu self)
-        {
-            return self.saveGameData[self.slugcatPageIndex]?.redsDeath ?? false;
         }
 
         private void SlugcatSelectMenu_UpdateStartButtonText(On.Menu.SlugcatSelectMenu.orig_UpdateStartButtonText orig, SlugcatSelectMenu self)
