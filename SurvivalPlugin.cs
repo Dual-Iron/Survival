@@ -3,7 +3,7 @@ using System;
 
 namespace Survival
 {
-    [BepInPlugin("com.github.dual.survival", "Survival", "1.0.0")]
+    [BepInPlugin("com.github.dual.survival", "Survival", "1.1.0")]
     public sealed class SurvivalPlugin : BaseUnityPlugin
     {
         public SurvivalMod? SurvivalRule { get; private set; }
