@@ -5,4 +5,4 @@
 	- You die permanently.
 - When this mod is enabled, you use a separate set of save files, so you can't accidentally lose a save file by leaving the mod on.
 
-Enjoy hell.
+Enjoy hell! Download [here](https://github.com/Dual-Iron/Survival/releases/latest).
